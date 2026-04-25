@@ -42,7 +42,15 @@ final class LaunchViewModel {
                 return
             }
         }
-        // Fallback: open with default app
         NSWorkspace.shared.open(url)
+    }
+
+    func openInFinder(_ project: Project) {
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: project.path)
+    }
+
+    func openAtIndex(_ index: Int) {
+        guard index < filteredProjects.count else { return }
+        openProject(filteredProjects[index])
     }
 }

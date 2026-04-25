@@ -58,11 +58,13 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
         let content = QuickLaunchView(viewModel: viewModel) { [weak self] in
             self?.hide()
         }
-        let hosting = NSHostingController(rootView: content)
+        // ignoresSafeArea so SwiftUI doesn't add any inset — the container clips to rounded corners
+        let hosting = NSHostingController(rootView: content.ignoresSafeArea())
 
+        // .borderless removes the titlebar safe-area inset that .titled adds to SwiftUI content
         let p = KeyablePanel(
             contentRect: NSRect(x: 0, y: 0, width: PANEL_WIDTH, height: PANEL_HEIGHT),
-            styleMask: [.titled, .borderless, .fullSizeContentView],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
@@ -71,11 +73,6 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
         p.isOpaque = false
         p.hasShadow = true
         p.isMovableByWindowBackground = true
-        p.titleVisibility = .hidden
-        p.titlebarAppearsTransparent = true
-        p.standardWindowButton(.closeButton)?.isHidden = true
-        p.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        p.standardWindowButton(.zoomButton)?.isHidden = true
         p.isReleasedWhenClosed = false
         p.delegate = self
 
@@ -84,6 +81,7 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
         container.layer?.cornerRadius = 16
         container.layer?.masksToBounds = true
 
+        // Frosted glass — same pattern as PasteMemo
         let blur = NSVisualEffectView(frame: container.bounds)
         blur.material = .headerView
         blur.blendingMode = .behindWindow
@@ -91,8 +89,11 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
         blur.autoresizingMask = [.width, .height]
         container.addSubview(blur)
 
+        // SwiftUI content on top; must be transparent so the blur shows through
         let hv = hosting.view
         hv.translatesAutoresizingMaskIntoConstraints = false
+        hv.wantsLayer = true
+        hv.layer?.backgroundColor = NSColor.clear.cgColor
         container.addSubview(hv)
         NSLayoutConstraint.activate([
             hv.topAnchor.constraint(equalTo: container.topAnchor),
@@ -121,6 +122,24 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
         }
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self else { return event }
+            let mods = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+
+            // Shift+Return — reveal in Finder
+            if event.keyCode == 36 && mods.contains(.shift) {
+                if self.viewModel.selectedIndex < self.viewModel.filteredProjects.count {
+                    self.viewModel.openInFinder(self.viewModel.filteredProjects[self.viewModel.selectedIndex])
+                    self.hide()
+                }
+                return nil
+            }
+
+            // Cmd+1…5 — open nth project directly
+            if mods == .command, let num = [18:0, 19:1, 20:2, 21:3, 23:4][Int(event.keyCode)] {
+                self.viewModel.openAtIndex(num)
+                self.hide()
+                return nil
+            }
+
             switch event.keyCode {
             case 125: self.viewModel.moveSelection(by: 1);  return nil  // ↓
             case 126: self.viewModel.moveSelection(by: -1); return nil  // ↑

@@ -1,0 +1,81 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "CodeLauncher-arm64-apple-macosx15.0-debug.exe": ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe>"]
+  "CodeLauncher-arm64-apple-macosx15.0-debug.module": ["<CodeLauncher-arm64-apple-macosx15.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe>","<CodeLauncher-arm64-apple-macosx15.0-debug.module>"]
+  "test": ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe>","<CodeLauncher-arm64-apple-macosx15.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/jishi/CodeLauncher/Sources/CodeLauncher/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher":
+    is-mutated: true
+commands:
+  "/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher-entitlement.plist":
+    tool: write-auxiliary-file
+    inputs: ["<entitlement-plist>","<com.apple.security.get-task-allow>"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher-entitlement.plist"]
+    description: "Write auxiliary file /Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher-entitlement.plist"
+
+  "/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/jishi/CodeLauncher/Sources/CodeLauncher/AppDelegate.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/CodeLauncherApp.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/HotkeyManager.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/LaunchViewModel.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/Project.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/QuickLaunchView.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/QuickLaunchWindowController.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/VSCodeReader.swift"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/sources"]
+    description: "Write auxiliary file /Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/sources"
+
+  "/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.product/Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/AppDelegate.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/CodeLauncherApp.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/HotkeyManager.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/LaunchViewModel.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/Project.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchView.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchWindowController.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/VSCodeReader.swift.o"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.product/Objects.LinkFileList"]
+    description: "Write auxiliary file /Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.product/Objects.LinkFileList"
+
+  "/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+
+  "<CodeLauncher-arm64-apple-macosx15.0-debug.exe>":
+    tool: phony
+    inputs: ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe-CodeSigning>"]
+    outputs: ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe>"]
+
+  "<CodeLauncher-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/AppDelegate.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/CodeLauncherApp.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/HotkeyManager.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/LaunchViewModel.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/Project.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchView.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchWindowController.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/VSCodeReader.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/Modules/CodeLauncher.swiftmodule"]
+    outputs: ["<CodeLauncher-arm64-apple-macosx15.0-debug.module>"]
+
+  "C.CodeLauncher-arm64-apple-macosx15.0-debug.exe":
+    tool: shell
+    inputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/AppDelegate.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/CodeLauncherApp.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/HotkeyManager.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/LaunchViewModel.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/Project.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchView.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchWindowController.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/VSCodeReader.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.product/Objects.LinkFileList"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher"]
+    description: "Linking ./.build/arm64-apple-macosx/debug/CodeLauncher"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-L","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug","-o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher","-module-name","CodeLauncher","-Xlinker","-no_warn_duplicate_libraries","-emit-executable","-Xlinker","-alias","-Xlinker","_CodeLauncher_main","-Xlinker","_main","-Xlinker","-rpath","-Xlinker","@loader_path","@/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.product/Objects.LinkFileList","-target","arm64-apple-macosx14.0","-framework","Carbon","-Xlinker","-add_ast_path","-Xlinker","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/Modules/CodeLauncher.swiftmodule","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g"]
+
+  "C.CodeLauncher-arm64-apple-macosx15.0-debug.exe-entitlements":
+    tool: shell
+    inputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher-entitlement.plist"]
+    outputs: ["<CodeLauncher-arm64-apple-macosx15.0-debug.exe-CodeSigning>"]
+    description: "Applying debug entitlements to ./.build/arm64-apple-macosx/debug/CodeLauncher"
+    args: ["codesign","--force","--sign","-","--entitlements","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher-entitlement.plist","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher"]
+
+  "C.CodeLauncher-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/jishi/CodeLauncher/Sources/CodeLauncher/AppDelegate.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/CodeLauncherApp.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/HotkeyManager.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/LaunchViewModel.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/Project.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/QuickLaunchView.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/QuickLaunchWindowController.swift","/Users/jishi/CodeLauncher/Sources/CodeLauncher/VSCodeReader.swift","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/sources"]
+    outputs: ["/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/AppDelegate.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/CodeLauncherApp.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/HotkeyManager.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/LaunchViewModel.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/Project.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchView.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/QuickLaunchWindowController.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/VSCodeReader.swift.o","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/Modules/CodeLauncher.swiftmodule"]
+    description: "Compiling Swift Module 'CodeLauncher' (8 sources)"
+    args: ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc","-module-name","CodeLauncher","-emit-dependencies","-emit-module","-emit-module-path","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/Modules/CodeLauncher.swiftmodule","-output-file-map","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/output-file-map.json","-incremental","-c","@/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/CodeLauncher.build/sources","-I","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx14.0","-enable-batch-mode","-index-store-path","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/index/store","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/jishi/CodeLauncher/.build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-Xfrontend","-entry-point-function-name","-Xfrontend","CodeLauncher_main","-swift-version","6","-sdk","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-F","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-I","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-L","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib","-g","-Xcc","-isysroot","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks","-Xcc","-F","-Xcc","/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks","-Xcc","-fPIC","-Xcc","-g","-package-name","codelauncher"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/jishi/CodeLauncher/Sources/CodeLauncher/","/Users/jishi/CodeLauncher/Package.swift","/Users/jishi/CodeLauncher/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

@@ -97,8 +97,11 @@ cat > "$APP_DIR/Contents/Info.plist" <<EOF
 EOF
 
 if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
-  printf '[package] codesigning\n'
+  printf '[package] codesigning with %s\n' "$CODESIGN_IDENTITY"
   codesign --force --deep --options runtime --sign "$CODESIGN_IDENTITY" "$APP_DIR"
+else
+  printf '[package] ad-hoc codesigning\n'
+  codesign --force --deep --sign - "$APP_DIR"
 fi
 
 printf '[package] creating dmg with create-dmg\n'

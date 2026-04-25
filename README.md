@@ -22,6 +22,13 @@ A lightweight macOS menu bar app that lets you instantly open recent VSCode (or 
 
 Download the latest DMG from [Releases](https://github.com/WtXeLd/CodeLauncher/releases), open it, and drag CodeLauncher to your Applications folder.
 
+> **First launch:** macOS may block the app because it is not notarized. Right-click (or Control-click) the app icon and choose **Open**, then click **Open** in the dialog. You only need to do this once.
+>
+> Alternatively, remove the quarantine attribute from Terminal:
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/CodeLauncher.app
+> ```
+
 On first launch, grant **Accessibility** permission when prompted — this is required for the global hotkey to work system-wide.
 
 ## Build from source

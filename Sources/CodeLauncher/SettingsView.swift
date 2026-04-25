@@ -20,6 +20,9 @@ struct SettingsView: View {
 
 private struct GeneralTab: View {
     @AppStorage("launchAtLogin") private var launchAtLogin = false
+    @State private var installedEditors: [EditorApp] = []
+    @State private var selectedBundleID: String = ""
+    @State private var customAppName: String = ""
 
     var body: some View {
         Form {
@@ -34,8 +37,76 @@ private struct GeneralTab: View {
                     }
                     .frame(minHeight: 22)
             }
+
+            Section("Editor") {
+                HStack {
+                    Text("Open projects with")
+                    Spacer()
+                    editorPicker
+                }
+                .frame(minHeight: 22)
+            }
         }
         .formStyle(.grouped)
+        .onAppear { loadEditors() }
+    }
+
+    @ViewBuilder
+    private var editorPicker: some View {
+        Menu {
+            ForEach(installedEditors) { editor in
+                Button {
+                    selectedBundleID = editor.id
+                    customAppName = ""
+                    EditorPreference.save(bundleID: editor.id)
+                } label: {
+                    Text(editor.name)
+                }
+            }
+            if !installedEditors.isEmpty { Divider() }
+            Button("Other...") { pickCustomApp() }
+        } label: {
+            HStack(spacing: 4) {
+                if !customAppName.isEmpty {
+                    Text(customAppName)
+                } else if let editor = installedEditors.first(where: { $0.id == selectedBundleID }) {
+                    Text(editor.name)
+                } else {
+                    Text("Select...").foregroundStyle(.secondary)
+                }
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+    }
+
+    private func loadEditors() {
+        installedEditors = EditorApp.installed
+        if let id = EditorPreference.savedBundleID {
+            selectedBundleID = id
+        } else if let path = EditorPreference.savedAppPath {
+            customAppName = URL(fileURLWithPath: path).deletingPathExtension().lastPathComponent
+        } else if let first = installedEditors.first {
+            selectedBundleID = first.id
+        }
+    }
+
+    private func pickCustomApp() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        panel.prompt = "Select"
+        if panel.runModal() == .OK, let url = panel.url {
+            let name = url.deletingPathExtension().lastPathComponent
+            customAppName = name
+            selectedBundleID = ""
+            EditorPreference.save(customPath: url.path)
+        }
     }
 }
 

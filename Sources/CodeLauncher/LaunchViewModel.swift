@@ -35,14 +35,11 @@ final class LaunchViewModel {
 
     func openProject(_ project: Project) {
         let url = URL(fileURLWithPath: project.path)
-        let bundleIDs = ["com.microsoft.VSCode", "com.todesktop.230313mzl4w4u92"]
-        for id in bundleIDs {
-            if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) {
-                NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration())
-                return
-            }
+        if let appURL = EditorPreference.resolvedAppURL() {
+            NSWorkspace.shared.open([url], withApplicationAt: appURL, configuration: NSWorkspace.OpenConfiguration())
+        } else {
+            NSWorkspace.shared.open(url)
         }
-        NSWorkspace.shared.open(url)
     }
 
     func openInFinder(_ project: Project) {

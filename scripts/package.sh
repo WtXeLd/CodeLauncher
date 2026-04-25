@@ -36,8 +36,6 @@ resolve_version() {
 
 VERSION="$(resolve_version)"
 APP_DIR="$DIST_DIR/${APP_NAME}.app"
-DMG_PATH="$DIST_DIR/${APP_NAME}-${VERSION}-${ARCH}.dmg"
-STAGING_DIR="$DIST_DIR/.dmg-staging"
 
 printf '[package] building %s %s (%s)\n' "$APP_NAME" "$VERSION" "$ARCH"
 swift build -c "$CONFIGURATION" --arch "$ARCH"
@@ -47,7 +45,7 @@ if [[ ! -x "$PRODUCT_BINARY" ]]; then
   exit 1
 fi
 
-rm -rf "$APP_DIR" "$STAGING_DIR"
+rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$DIST_DIR"
 
 cp "$PRODUCT_BINARY" "$APP_DIR/Contents/MacOS/$EXECUTABLE_NAME"
@@ -103,20 +101,20 @@ if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
   codesign --force --deep --options runtime --sign "$CODESIGN_IDENTITY" "$APP_DIR"
 fi
 
-mkdir -p "$STAGING_DIR"
-cp -R "$APP_DIR" "$STAGING_DIR/"
-ln -s /Applications "$STAGING_DIR/Applications"
-rm -f "$DMG_PATH"
+printf '[package] creating dmg with create-dmg\n'
+cd "$DIST_DIR"
+create-dmg \
+  --overwrite \
+  --no-code-sign \
+  "$APP_DIR" \
+  "$DIST_DIR"
 
-printf '[package] creating dmg %s\n' "$(basename "$DMG_PATH")"
-hdiutil create \
-  -volname "$APP_NAME" \
-  -srcfolder "$STAGING_DIR" \
-  -ov \
-  -format UDZO \
-  "$DMG_PATH" >/dev/null
-
-rm -rf "$STAGING_DIR"
+# create-dmg names the file "<AppName> <Version>.dmg" — rename to our convention
+CREATED_DMG=$(ls "$DIST_DIR/${APP_NAME} "*.dmg 2>/dev/null | head -1 || true)
+if [[ -n "$CREATED_DMG" ]]; then
+  TARGET="$DIST_DIR/${APP_NAME}-${VERSION}-${ARCH}.dmg"
+  mv "$CREATED_DMG" "$TARGET"
+  printf '[package] dmg: %s\n' "$TARGET"
+fi
 
 printf '[package] app: %s\n' "$APP_DIR"
-printf '[package] dmg: %s\n' "$DMG_PATH"

@@ -4,6 +4,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         HotkeyManager.shared.register()
+        Task { await UpdateChecker.shared.checkOnLaunch() }
 
         // When all windows close, return to .accessory so the Dock icon disappears
         NotificationCenter.default.addObserver(

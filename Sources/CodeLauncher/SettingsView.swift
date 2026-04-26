@@ -9,6 +9,8 @@ struct SettingsView: View {
                 .tabItem { Label("General", systemImage: "gear") }
             ShortcutsTab()
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
+            AboutTab()
+                .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
@@ -143,5 +145,69 @@ private struct ShortcutsTab: View {
 
     private func apply() {
         HotkeyManager.shared.update(keyCode: keyCode, modifiers: modifiers)
+    }
+}
+
+// MARK: - About
+
+private struct AboutTab: View {
+    var updateChecker = UpdateChecker.shared
+
+    var body: some View {
+        Form {
+            Section {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 8) {
+                        Image(nsImage: NSApp.applicationIconImage)
+                            .resizable()
+                            .frame(width: 64, height: 64)
+                        Text("CodeLauncher")
+                            .font(.headline)
+                        Text("Version \(UpdateChecker.currentVersion)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section {
+                HStack {
+                    statusView
+                    Spacer()
+                    Button("Check for Updates") {
+                        Task { await updateChecker.checkManually() }
+                    }
+                    .disabled(updateChecker.checkState == .checking)
+                }
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    @ViewBuilder
+    private var statusView: some View {
+        switch updateChecker.checkState {
+        case .idle:
+            EmptyView()
+        case .checking:
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text("Checking…").foregroundStyle(.secondary)
+            }
+        case .upToDate:
+            Label("Up to date", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+        case .updateAvailable(let version):
+            Label("v\(version) available", systemImage: "arrow.down.circle.fill")
+                .foregroundStyle(.blue)
+        case .error(let message):
+            Label(message, systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+                .lineLimit(2)
+                .font(.caption)
+        }
     }
 }

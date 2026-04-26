@@ -14,6 +14,7 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
     static let shared = QuickLaunchWindowController()
 
     private var panel: NSPanel?
+    private var hostingController: NSHostingController<AnyView>?
     private let viewModel = LaunchViewModel()
     private var clickMonitor: Any?
     private var keyMonitor: Any?
@@ -59,7 +60,8 @@ final class QuickLaunchWindowController: NSObject, NSWindowDelegate {
             self?.hide()
         }
         // ignoresSafeArea so SwiftUI doesn't add any inset — the container clips to rounded corners
-        let hosting = NSHostingController(rootView: content.ignoresSafeArea())
+        let hosting = NSHostingController(rootView: AnyView(content.ignoresSafeArea()))
+        self.hostingController = hosting
 
         // .borderless removes the titlebar safe-area inset that .titled adds to SwiftUI content
         let p = KeyablePanel(

@@ -58,7 +58,7 @@ struct QuickLaunchView: View {
                                 isSelected: index == viewModel.selectedIndex,
                                 shortcutIndex: index < 5 ? index + 1 : nil
                             )
-                            .id(index)
+                            .id(project.id)
                             .onTapGesture {
                                 viewModel.openProject(project)
                                 onDismiss()
@@ -70,8 +70,10 @@ struct QuickLaunchView: View {
                 .padding(.vertical, 6)
             }
             .onChange(of: viewModel.selectedIndex) { _, newIndex in
-                    proxy.scrollTo(newIndex, anchor: .center)
+                if newIndex < viewModel.filteredProjects.count {
+                    proxy.scrollTo(viewModel.filteredProjects[newIndex].id, anchor: .center)
                 }
+            }
         }
     }
 

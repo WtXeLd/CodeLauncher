@@ -2,6 +2,8 @@
 
 A lightweight macOS menu bar app that lets you instantly open recent VSCode (or Cursor) projects from anywhere with a global hotkey.
 
+<img width="646" height="466" alt="截屏2026-04-26 17 30 46" src="https://github.com/user-attachments/assets/9a6117f8-4736-47cb-9242-b3a231c6fdff" />
+
 ## Features
 
 - **Global hotkey** — Press `⌘⇧S` from any app to bring up the launcher panel

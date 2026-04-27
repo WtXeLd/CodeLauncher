@@ -17,6 +17,7 @@ struct CodeLauncherApp: App {
 
 private struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
+    @AppStorage("hideDockIcon") private var hideDockIcon = false
 
     var body: some View {
         Button("Open Panel") {
@@ -27,7 +28,9 @@ private struct MenuBarContent: View {
         Divider()
 
         Button("Settings...") {
-            NSApp.setActivationPolicy(.regular)
+            if !hideDockIcon {
+                NSApp.setActivationPolicy(.regular)
+            }
             openSettings()
             NSApp.activate(ignoringOtherApps: true)
         }

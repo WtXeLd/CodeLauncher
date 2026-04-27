@@ -22,6 +22,7 @@ struct SettingsView: View {
 
 private struct GeneralTab: View {
     @AppStorage("launchAtLogin") private var launchAtLogin = false
+    @AppStorage("hideDockIcon") private var hideDockIcon = false
     @State private var installedEditors: [EditorApp] = []
     @State private var selectedBundleID: String = ""
     @State private var customAppName: String = ""
@@ -35,6 +36,13 @@ private struct GeneralTab: View {
                             try? SMAppService.mainApp.register()
                         } else {
                             try? SMAppService.mainApp.unregister()
+                        }
+                    }
+                    .frame(minHeight: 22)
+                Toggle("Hide Dock icon", isOn: $hideDockIcon)
+                    .onChange(of: hideDockIcon) {
+                        if hideDockIcon {
+                            NSApp.setActivationPolicy(.accessory)
                         }
                     }
                     .frame(minHeight: 22)

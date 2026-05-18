@@ -5,16 +5,45 @@ enum VSCodeReader {
     static func readRecentProjects() -> [Project] {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let candidates = [
-            "Library/Application Support/Code/User/globalStorage/state.vscdb",
-            "Library/Application Support/Cursor/User/globalStorage/state.vscdb",
+            "Library/Application Support/Code/User/globalStorage",
+            "Library/Application Support/Cursor/User/globalStorage",
         ]
+
+        var seen = Set<String>()
+        var projects: [Project] = []
+
         for relative in candidates {
             let url = home.appendingPathComponent(relative)
-            if let projects = readDatabase(at: url), !projects.isEmpty {
-                return projects
-            }
+            append(readStorageJSON(at: url.appendingPathComponent("storage.json")), seen: &seen, projects: &projects)
+            append(readDatabase(at: url.appendingPathComponent("state.vscdb")), seen: &seen, projects: &projects)
+            append(readDatabase(at: url.appendingPathComponent("state.vscdb.backup")), seen: &seen, projects: &projects)
         }
-        return []
+
+        return projects
+    }
+
+    private static func readStorageJSON(at url: URL) -> [Project]? {
+        guard
+            let data = try? Data(contentsOf: url),
+            let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+
+        var seen = Set<String>()
+        var projects: [Project] = []
+
+        if let menubarData = root["lastKnownMenubarData"] as? [String: Any] {
+            collectMenubarProjects(from: menubarData, seen: &seen, projects: &projects)
+        }
+
+        if let backupWorkspaces = root["backupWorkspaces"] as? [String: Any] {
+            collectBackupWorkspaceProjects(from: backupWorkspaces, seen: &seen, projects: &projects)
+        }
+
+        if let profileAssociations = root["profileAssociations"] as? [String: Any] {
+            collectProfileAssociationProjects(from: profileAssociations, seen: &seen, projects: &projects)
+        }
+
+        return projects
     }
 
     private static func readDatabase(at url: URL) -> [Project]? {
@@ -52,14 +81,82 @@ enum VSCodeReader {
                 rawURI = nil
             }
 
-            guard let uri = rawURI,
-                  let fileURL = URL(string: uri),
-                  fileURL.scheme == "file" else { continue }
-
-            let path = fileURL.path
-            guard seen.insert(path).inserted else { continue }
-            projects.append(Project(path: path))
+            appendProject(fromURI: rawURI, seen: &seen, projects: &projects)
         }
         return projects
+    }
+
+    private static func collectMenubarProjects(from value: [String: Any], seen: inout Set<String>, projects: inout [Project]) {
+        guard
+            let menus = value["menus"] as? [String: Any],
+            let fileMenu = menus["File"] as? [String: Any],
+            let items = fileMenu["items"] as? [[String: Any]]
+        else { return }
+
+        collectMenubarProjects(from: items, seen: &seen, projects: &projects)
+    }
+
+    private static func collectMenubarProjects(from items: [[String: Any]], seen: inout Set<String>, projects: inout [Project]) {
+        for item in items {
+            if let id = item["id"] as? String, id == "openRecentFolder" || id == "openRecentWorkspace" {
+                appendProject(fromURIValue: item["uri"], seen: &seen, projects: &projects)
+            }
+
+            if let submenu = item["submenu"] as? [String: Any],
+               let children = submenu["items"] as? [[String: Any]] {
+                collectMenubarProjects(from: children, seen: &seen, projects: &projects)
+            }
+        }
+    }
+
+    private static func collectBackupWorkspaceProjects(from value: [String: Any], seen: inout Set<String>, projects: inout [Project]) {
+        if let folders = value["folders"] as? [[String: Any]] {
+            for folder in folders {
+                appendProject(fromURI: folder["folderUri"] as? String, seen: &seen, projects: &projects)
+            }
+        }
+
+        if let workspaces = value["workspaces"] as? [[String: Any]] {
+            for workspace in workspaces {
+                appendProject(fromURIValue: workspace["configPath"], seen: &seen, projects: &projects)
+            }
+        }
+    }
+
+    private static func collectProfileAssociationProjects(from value: [String: Any], seen: inout Set<String>, projects: inout [Project]) {
+        guard let workspaces = value["workspaces"] as? [String: Any] else { return }
+
+        for uri in workspaces.keys {
+            appendProject(fromURI: uri, seen: &seen, projects: &projects)
+        }
+    }
+
+    private static func append(_ newProjects: [Project]?, seen: inout Set<String>, projects: inout [Project]) {
+        guard let newProjects else { return }
+
+        for project in newProjects where seen.insert(project.path).inserted {
+            projects.append(project)
+        }
+    }
+
+    private static func appendProject(fromURIValue value: Any?, seen: inout Set<String>, projects: inout [Project]) {
+        if let uri = value as? String {
+            appendProject(fromURI: uri, seen: &seen, projects: &projects)
+        } else if let uri = value as? [String: Any], uri["scheme"] as? String == "file", let path = uri["path"] as? String {
+            appendProject(fromPath: path, seen: &seen, projects: &projects)
+        }
+    }
+
+    private static func appendProject(fromURI uri: String?, seen: inout Set<String>, projects: inout [Project]) {
+        guard let uri,
+              let fileURL = URL(string: uri),
+              fileURL.scheme == "file" else { return }
+
+        appendProject(fromPath: fileURL.path, seen: &seen, projects: &projects)
+    }
+
+    private static func appendProject(fromPath path: String, seen: inout Set<String>, projects: inout [Project]) {
+        guard seen.insert(path).inserted else { return }
+        projects.append(Project(path: path))
     }
 }
